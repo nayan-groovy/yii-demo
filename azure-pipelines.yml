@@ -1,10 +1,10 @@
-# PHP Azure Pipeline YAML file for GitHub repository integration.
-# Documentation: https://docs.microsoft.com/azure/devops/pipelines/languages/php
+# PHP
+# Test and package your PHP project.
+# Add steps that run tests, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/php
 
 trigger:
-  branches:
-    include:
-      - main # Replace 'main' with your default branch if different
+  - azure-pipelines-nayan
 
 pool:
   vmImage: 'ubuntu-latest'
