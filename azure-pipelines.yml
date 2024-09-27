@@ -1,0 +1,52 @@
+# PHP
+# Test and package your PHP project.
+# Add steps that run tests, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/php
+
+trigger:
+  - azure-pipelines-nayan
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  phpVersion: '7.4' # Specify the PHP version you are using
+
+steps:
+  # Step 1: Set the PHP version
+  - script: |
+      sudo update-alternatives --set php /usr/bin/php$(phpVersion)
+      sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
+      sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
+      sudo update-alternatives --set php-cgi /usr/bin/php-cgi$(phpVersion)
+      sudo update-alternatives --set phar.phar /usr/bin/phar.phar$(phpVersion)
+      php -version
+    displayName: 'Use PHP version $(phpVersion)'
+
+  # Step 2: Install Composer dependencies
+  - script: |
+      composer install --no-interaction --prefer-dist
+    displayName: 'Install Composer Dependencies'
+
+  # Step 3: Run tests using PHPUnit
+  - script: |
+      vendor/bin/phpunit --testdox
+    displayName: 'Run PHPUnit Tests'
+    continueOnError: true # Optional: Continue even if tests fail
+
+  # Step 4: Package the application
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '.' # Root folder of your project
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+      verbose: true
+    displayName: 'Package Application Files'
+
+  # Step 5: Publish the build artifact
+  - publish: $(Build.ArtifactStagingDirectory)/app.zip
+    artifact: app
+    displayName: 'Publish Build Artifact'
+
+
